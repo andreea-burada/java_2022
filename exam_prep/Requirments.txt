@@ -48,8 +48,11 @@
 	//	a. create the public class VectThread which implements Runnable and contains 2 fields:
 	//	- phonesList with interface as type List<ElectronicDevices>
 	//  - avgWeight is a real (double) number for storing the average weight of the phones list
+	
 	//  b. In the constructor read the file using readBinaryPhones static method from Utils
+	
 	//	c. provide get methods for the both fields (phoneList and avgweight) of the class  
+	
 	//	d. Within the override run method (with the signature in Runnable interface) 
 	//	- the developer should go through the phoneList and calculate the average of the weights from the phone list objects (Phone class - explicit cast) 
 	
