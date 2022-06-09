@@ -17,17 +17,18 @@ public class VectThread implements Runnable {
 		if (devicesList.size() == 0)
 		{	
 			avgWeight = 0.0;
-			return;
 		}
-		
-		double sumWeight = 0.0;
-		for (ElectronicDevices dev : devicesList)
+		else
 		{
-			Phone ph = (Phone) dev;
-			sumWeight += ph.getWeight();
+			double sumWeight = 0.0;
+			for (ElectronicDevices dev : devicesList)
+			{
+				Phone ph = (Phone) dev;
+				sumWeight += ph.getWeight();
+			}
+			
+			avgWeight = sumWeight / devicesList.size();
 		}
-		
-		avgWeight = sumWeight / devicesList.size();
 	}
 	
 	// getters
