@@ -60,19 +60,25 @@
 // Subject of + 2 points <=> Mark 6 or 7 (and parts of the mark 8):
 	//	a. Create public class TCPServerSocketMultiT which handles multi-threading TCP server socket connections
 	//	for implementing a proprietary communication protocol (set of rules)
+	
 	//	b. The class contains the following private fields:
 	//	- serverSocket as ServerSocket, port = 50001 as int, f as File and vt as VectThread ("has a" relationship)
+	
 	//	c. The class contains the following methods and constructor:
-	//		c.1 - constructor which get the port as parameter and create the serverSocket:
+	//		c.1 - constructor which gets the port as parameter and create the serverSocket:
 	//		public TCPServerSocketMultiT(int port) throws Exception
 	//		c.2 - getter and setter for the field port
 	//		c.3 - public void setFileName(String newFName) method which allocate memory for the field f, if and only if, 
 	//			the String parameter is different than null, otherwise is setting null
 	//		c.4.- public void startTCPServer() throws IOException method which is having the infinite processing loop and is implementing 3 commands from the proprietary protocol
-	//		HINTS for startTCPServer method:
+	
+	//			HINTS for startTCPServer method:
 	//		-create multi-threading by using lambda expressions from Runnable functional interface after the blocking accept() method from serverSocket object
+	
 	//		-get the input stream as BufferedReader and output stream as ObjectOutputStream
+	
 	//		-initialize the vt field from class VectThread by passing the file absolute path from f field as parameters AND OBTAIN the list (ArrayList of Phone objects) from the file 
+	
 	//		-parse line by line the TCP request
 	//			- if EXIT text command is received over the socket, then break the infinite loop of the processing and send TCP FIN packet back to the TCP client (e.g. by closing socket, etc.)
 	//			- (mark 6) if GETFILE text command is received over the socket, then reply back the serialized list encapsulated in the vt object field
@@ -83,9 +89,11 @@
 // Mark 8: create public class UtilsDAO with only one static field c from class Connection (SQL/JDBC)
 	//	This class contains the following 3 static methods:
 	//	a.	public static void setConnection() - set the connection by using org.sqlite.JDBC driver and connection string: jdbc:sqlite:test.db
+	
 	//	b.	public static void closeConnection() - close the SQL/JDBC connection
+	
 	//	c.	public static String selectData() throws SQLException - for SQL selecting all the phones from the already created SQLite DB file
-	//		- select * from PHONES
+	//		- select * from PHONES 
 	//		- PHONES table is already created with the following columns id - INT, PRODUCER - TEXT, DIAGONAL - REAL and WEIGHT - REAL
 	//		- the String containing the view after selecting the entire table is having each table line separated with "\r\n" and each column value will be separated by ":"
 

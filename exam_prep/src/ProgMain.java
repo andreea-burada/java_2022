@@ -1,3 +1,4 @@
+import java.sql.SQLException;
 import java.util.List;
 import entities.*;
 
@@ -31,6 +32,17 @@ public class ProgMain {
 			Phone p = (Phone)o;
 			System.out.println(p);
 		}
+		
+		System.out.println("\n\n");
+		UtilsDAO.setConnection();
+		String query;
+		try {
+			query = UtilsDAO.selectData();
+			System.out.println(query);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		UtilsDAO.closeConnection();
 	}
 
 }
