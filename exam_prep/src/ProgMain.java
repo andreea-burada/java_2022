@@ -53,10 +53,27 @@ public class ProgMain {
 		try {
 			trd.join();
 			System.out.println("Avg weight - " + Math.round(t1.getAvgWeight() * 100.0) / 100.0 );
+			String phonesList = "";
+			List<ElectronicDevices> pList = t1.getDevicesList();
+			for(ElectronicDevices eDev : pList)
+			{
+				Phone currentPhone = (Phone)eDev;
+				phonesList += currentPhone.toString() + ";;;\n";
+			}
+			System.out.println(phonesList);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		
-	}
+		// testing TCP
+		try {
+			TCPServerSocketMultiT tcpServer = new TCPServerSocketMultiT(7787);
+			tcpServer.setFileName("Phones.bin");
+			tcpServer.startTCPServer();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}	// end main
 
 }
