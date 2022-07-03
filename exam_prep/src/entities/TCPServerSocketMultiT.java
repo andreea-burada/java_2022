@@ -15,6 +15,10 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 // Subject of + 2 points <=> Mark 6 or 7 (and parts of the mark 8):
 //	a. Create public class TCPServerSocketMultiT which handles multi-threading TCP server 
 //socket connections
@@ -124,7 +128,7 @@ public class TCPServerSocketMultiT {
 							} else if ("GETDB".equals(currentLine)) // if GETDB text command is received over
 							// the socket, then reply
 							// back with the list as String produced by UtilsDAO.selectData() (please also
-							// take into account, you have to initialize JDBC connection and close it with
+							// take into account, you have to initialise JDBC connection and close it with
 							// static methods from UtilsDAO);
 							{
 								try {
@@ -134,6 +138,26 @@ public class TCPServerSocketMultiT {
 								} catch (SQLException e) {
 									e.printStackTrace();
 								}
+							} else if ("GETJSON".equals(currentLine)) // if GETJSON text command is received 
+								//over the socket, then reply back with the list in JSON format
+							{
+								JSONObject currentObj;
+								JSONArray phonesJSON = new JSONArray();
+								for(ElectronicDevices elD : phonesList)
+								{
+									Phone currentPhone = (Phone) elD;
+									currentObj = new JSONObject();
+									try {
+										currentObj.put("weight", Float.toString(currentPhone.getWeight()));
+										currentObj.put("diagonal", Double.toString(currentPhone.getDiagonal()));
+										currentObj.put("producer", currentPhone.getProducer());
+									} catch (JSONException e) {
+										e.printStackTrace();
+									}
+									phonesJSON.put(currentObj);
+								}
+								serverOutputStream.writeObject(phonesJSON.toString());
+								
 							} else if ("EXIT".equals(currentLine)) {
 								serverOutputStream.writeObject("TCP FIN");
 								isListening = false;
@@ -149,7 +173,7 @@ public class TCPServerSocketMultiT {
 						// break;
 					}
 				}
-				System.out.println("Goodbye Client!");
+				System.out.println("Goodbye Client!\n");
 			}
 		};
 		// running TCP server

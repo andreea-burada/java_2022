@@ -1,7 +1,5 @@
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -9,11 +7,10 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.List;
 
-import org.json.JSONArray;
+import entities.ElectronicDevices;
+import entities.Phone;
 
-import entities.*;
-
-public class ProgMainTCP_Client {
+public class ProgMainTCP_Client2 {
 
 	public static void main(String[] args) {
 		int port = 7787;
@@ -45,21 +42,13 @@ public class ProgMainTCP_Client {
 				String db = (String) serverObjInput.readObject();
 				System.out.println(db + "\n");
 				
-				writer2Server.println("GETJSON");
-				writer2Server.flush();
-				//JSONArray phonesJSONArray = (JSONArray) serverObjInput.readObject();
-				String phonesJSONArray = (String) serverObjInput.readObject();
-				System.out.println(phonesJSONArray + "\n");
-				
 				String received;
 				writer2Server.println("EXIT");
 				writer2Server.flush();
+				
 				received = (String) serverObjInput.readObject();
 				System.out.println(received + "\n");
-//				while (true)
-//				{
-//					
-//				}
+				
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -69,6 +58,7 @@ public class ProgMainTCP_Client {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
 
 	}
 
