@@ -12,6 +12,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -74,30 +75,25 @@ public class TCPServerSocketMultiT {
 	}
 
 	public void startTCPServer() throws IOException {
-		// device list
+		System.out.println("Starting TCP server...\n");
+
+		// device list -> list of objects (Phone)
 		vt = new VectThread(f.getAbsolutePath());
 		List<ElectronicDevices> phonesList = vt.getDevicesList();
 
-		// Lambda for TCP
-		Runnable server = () -> {
-			String phonesListSer = "";
-			for (ElectronicDevices eDev : phonesList) {
-				Phone currentPhone = (Phone) eDev;
-				phonesListSer += currentPhone.toString() + ";;;\n";
-			}
-
-			// accept clients
-			while (true) {
-				Socket clientSocket = null;
-
+		// processing clients
+		while (true) {
+			Socket clientSocket = serverSocket.accept();
+			// Lambda for TCP
+			Runnable server = () -> {
 				InputStream clientData = null;
 				BufferedReader clientBuffReader = null;
 
 				OutputStream serverData = null;
 				ObjectOutputStream serverOutputStream = null;
 				try {
-					clientSocket = serverSocket.accept(); // get client
-
+					// get client
+					boolean isListening = true;
 					// input stream -> get data from client
 					clientData = clientSocket.getInputStream();
 					clientBuffReader = new BufferedReader(new InputStreamReader(clientData));
@@ -105,15 +101,10 @@ public class TCPServerSocketMultiT {
 					// output stream -> send data to client
 					serverData = clientSocket.getOutputStream();
 					serverOutputStream = new ObjectOutputStream(serverData);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
 
-				boolean isListening = true;
+					while (isListening) // processing client
+					{
 
-				while (isListening) // processing client
-				{
-					try {
 						// parsing line by line
 						String currentLine;
 						while ((currentLine = clientBuffReader.readLine()) != null && currentLine.length() > 0) {
@@ -138,13 +129,12 @@ public class TCPServerSocketMultiT {
 								} catch (SQLException e) {
 									e.printStackTrace();
 								}
-							} else if ("GETJSON".equals(currentLine)) // if GETJSON text command is received 
-								//over the socket, then reply back with the list in JSON format
+							} else if ("GETJSON".equals(currentLine)) // if GETJSON text command is received
+							// over the socket, then reply back with the list in JSON format
 							{
 								JSONObject currentObj;
 								JSONArray phonesJSON = new JSONArray();
-								for(ElectronicDevices elD : phonesList)
-								{
+								for (ElectronicDevices elD : phonesList) {
 									Phone currentPhone = (Phone) elD;
 									currentObj = new JSONObject();
 									try {
@@ -157,29 +147,35 @@ public class TCPServerSocketMultiT {
 									phonesJSON.put(currentObj);
 								}
 								serverOutputStream.writeObject(phonesJSON.toString());
-								
+
 							} else if ("EXIT".equals(currentLine)) {
 								serverOutputStream.writeObject("TCP FIN");
 								isListening = false;
 								clientSocket.close(); // close client connection
-								break;
 							} else {
 								serverOutputStream.writeObject("IDK what that is");
 							}
 						}
-						//System.out.println("Outside the parse while");
+						// System.out.println("Outside the parse while");
+
+					}
+					System.out.println("Goodbye Client!\n");
+				} catch (IOException ioex) {
+					ioex.printStackTrace();
+				} finally {
+					try {
+						clientSocket.close();
 					} catch (IOException e) {
 						e.printStackTrace();
-						// break;
 					}
 				}
-				System.out.println("Goodbye Client!\n");
-			}
-		};
-		// running TCP server
-		Thread serverThread = new Thread(server);
-		System.out.println("Starting TCP server...");
-		serverThread.start();
+			};	// lambda end
+			
+			// running TCP server -> create thread for each client
+			Thread serverThread = new Thread(server);
+			System.out.println("Hello Client!\n");
+			serverThread.start();
+		}
 	}
 
 	public void setFileName(String newFName) {
