@@ -84,8 +84,23 @@ public class TCPServerSocketMultiT {
 
 			// accept
 			Socket clientSocket = null;
+			
+			InputStream clientData = null;
+			BufferedReader clientBuffReader = null;
+			
+			OutputStream serverData = null;
+			ObjectOutputStream serverOutputStream = null;
 			try {
 				clientSocket = serverSocket.accept(); // get client
+				
+				// input stream -> get data from client
+				clientData = clientSocket.getInputStream();
+				clientBuffReader 
+					= new BufferedReader(new InputStreamReader(clientData));
+
+				// output stream -> send data to client
+				serverData = clientSocket.getOutputStream();
+				serverOutputStream = new ObjectOutputStream(serverData);
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -95,59 +110,47 @@ public class TCPServerSocketMultiT {
 			while (isListening) // processing client
 			{
 				try {
-					// input stream -> get data from client
-					InputStream clientData = clientSocket.getInputStream();
-					BufferedReader clientBuffReader 
-						= new BufferedReader(new InputStreamReader(clientData));
-
-					// output stream -> send data to client
-					OutputStream serverData = clientSocket.getOutputStream();
-					ObjectOutputStream serverOutputStream = new ObjectOutputStream(serverData);
-
 					// parsing line by line
 					String currentLine;
-					while ((currentLine = clientBuffReader.readLine()) != null) {
+					while ((currentLine = clientBuffReader.readLine()) != null 
+							&& currentLine.length() > 0) {
+						//serverOutputStream.reset();
 						System.out.println("Server line: " + currentLine);
 						
-//						if (currentLine == "GETFILE") // if GETFILE text command is received over
-//						// the socket, then reply
-//						// back the serialised list encapsulated in the vt object field
-//						{
-//							serverOutputStream.writeObject(phonesList);
-//						} else if (currentLine == "GETDB") // if GETDB text command is received over
-//						// the socket, then reply
-//						// back with the list as String produced by UtilsDAO.selectData() (please also
-//						// take into account, you have to initialize JDBC connection and close it with
-//						// static methods from UtilsDAO);
-//						{
-//							try {
-//								UtilsDAO.setConnection();
-//								serverOutputStream.writeObject(UtilsDAO.selectData());
-//								UtilsDAO.closeConnection();
-//							} catch (SQLException e) {
-//								e.printStackTrace();
-//							}
-//						} else if (currentLine == "EXIT") {
-//							serverOutputStream.writeObject("EXIT Received.");
-//							isListening = false;
-//							clientSocket.close();	// close client connection
-//						}
-//						else
-//						{
-//							serverOutputStream.writeObject("IDK what that is");
-//						}
+						if ("GETFILE".equals(currentLine)) // if GETFILE text command is received over
+						// the socket, then reply
+						// back the serialised list encapsulated in the vt object field
+						{
+							serverOutputStream.writeObject(phonesList);
+						} else if ("GETDB".equals(currentLine)) // if GETDB text command is received over
+						// the socket, then reply
+						// back with the list as String produced by UtilsDAO.selectData() (please also
+						// take into account, you have to initialize JDBC connection and close it with
+						// static methods from UtilsDAO);
+						{
+							try {
+								UtilsDAO.setConnection();
+								serverOutputStream.writeObject(UtilsDAO.selectData());
+								UtilsDAO.closeConnection();
+							} catch (SQLException e) {
+								e.printStackTrace();
+							}
+						} else if ("EXIT".equals(currentLine)) {
+							serverOutputStream.writeObject("TCP FIN");
+							isListening = false;
+							clientSocket.close();	// close client connection
+							break;
+						}
+						else
+						{
+							serverOutputStream.writeObject("IDK what that is");
+						}
 					}
 					System.out.println("Outside the parse while");
 				} catch (IOException e) {
 					e.printStackTrace();
+					//break;
 				}
-			}
-			//Thread.currentThread().interrupt(); // stop the thread
-			try {
-				serverSocket.close();
-			} catch (IOException e) {
-				System.out.println("Server Socket closed");
-			}
 		};
 		// running TCP server
 		Thread serverThread = new Thread(server);

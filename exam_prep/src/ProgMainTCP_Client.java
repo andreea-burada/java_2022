@@ -37,8 +37,13 @@ public class ProgMainTCP_Client {
 					System.out.println(currentPh);
 				}
 				
+				writer2Server.println("GETDB");
+				writer2Server.flush();
+				String db = (String) serverObjInput.readObject();
+				System.out.println(db);
+				
 				String received;
-				writer2Server.printf("EXIT");
+				writer2Server.println("EXIT");
 				writer2Server.flush();
 				
 				received = (String) serverObjInput.readObject();
