@@ -2,10 +2,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.List;
+
+import entities.*;
 
 public class ProgMainTCP_Client {
 
@@ -17,27 +21,33 @@ public class ProgMainTCP_Client {
 			Socket socket = new Socket(address, port);
 			OutputStream serverOutput = socket.getOutputStream();
 			PrintWriter writer2Server = new PrintWriter(serverOutput);
-			writer2Server.println("GETDB");
 			
 			InputStream serverInput = socket.getInputStream();
-			BufferedReader serverBuffReader 
-				= new BufferedReader(new InputStreamReader(serverInput));
+			ObjectInputStream serverObjInput 
+				= new ObjectInputStream(serverInput);
 			
-			String current = "";
-			StringBuffer allData = new StringBuffer("");
-			while ((current = serverBuffReader.readLine()) != null)
-			{
-				allData.append(current);
+			try {
+				writer2Server.println("GETFILE\n");
+				writer2Server.flush();
+				
+				List<ElectronicDevices> elList = (List<ElectronicDevices>) serverObjInput.readObject();
+				for(ElectronicDevices currentElD : elList)
+				{
+					Phone currentPh = (Phone) currentElD;
+					System.out.println(currentPh);
+				}
+				
+				String received;
+				writer2Server.printf("EXIT");
+				writer2Server.flush();
+				
+				received = (String) serverObjInput.readObject();
+				System.out.println(received + "\n\n");
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
 			}
-			System.out.println(current + "\n\n");
-			writer2Server.println("EXIT");
-			allData.delete(0, allData.length());
-			while ((current = serverBuffReader.readLine()) != null
-					&& (current.length() > 0))
-			{
-				allData.append(current);
-			}
-			System.out.println(current + "\n\n");
+			writer2Server.close();
+			serverObjInput.close();
 			socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
