@@ -82,78 +82,79 @@ public class TCPServerSocketMultiT {
 				phonesListSer += currentPhone.toString() + ";;;\n";
 			}
 
-			// accept
-			Socket clientSocket = null;
-			
-			InputStream clientData = null;
-			BufferedReader clientBuffReader = null;
-			
-			OutputStream serverData = null;
-			ObjectOutputStream serverOutputStream = null;
-			try {
-				clientSocket = serverSocket.accept(); // get client
-				
-				// input stream -> get data from client
-				clientData = clientSocket.getInputStream();
-				clientBuffReader 
-					= new BufferedReader(new InputStreamReader(clientData));
+			// accept clients
+			while (true) {
+				Socket clientSocket = null;
 
-				// output stream -> send data to client
-				serverData = clientSocket.getOutputStream();
-				serverOutputStream = new ObjectOutputStream(serverData);
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+				InputStream clientData = null;
+				BufferedReader clientBuffReader = null;
 
-			boolean isListening = true;
-
-			while (isListening) // processing client
-			{
+				OutputStream serverData = null;
+				ObjectOutputStream serverOutputStream = null;
 				try {
-					// parsing line by line
-					String currentLine;
-					while ((currentLine = clientBuffReader.readLine()) != null 
-							&& currentLine.length() > 0) {
-						//serverOutputStream.reset();
-						System.out.println("Server line: " + currentLine);
-						
-						if ("GETFILE".equals(currentLine)) // if GETFILE text command is received over
-						// the socket, then reply
-						// back the serialised list encapsulated in the vt object field
-						{
-							serverOutputStream.writeObject(phonesList);
-						} else if ("GETDB".equals(currentLine)) // if GETDB text command is received over
-						// the socket, then reply
-						// back with the list as String produced by UtilsDAO.selectData() (please also
-						// take into account, you have to initialize JDBC connection and close it with
-						// static methods from UtilsDAO);
-						{
-							try {
-								UtilsDAO.setConnection();
-								serverOutputStream.writeObject(UtilsDAO.selectData());
-								UtilsDAO.closeConnection();
-							} catch (SQLException e) {
-								e.printStackTrace();
-							}
-						} else if ("EXIT".equals(currentLine)) {
-							serverOutputStream.writeObject("TCP FIN");
-							isListening = false;
-							clientSocket.close();	// close client connection
-							break;
-						}
-						else
-						{
-							serverOutputStream.writeObject("IDK what that is");
-						}
-					}
-					System.out.println("Outside the parse while");
-				} catch (IOException e) {
-					e.printStackTrace();
-					//break;
+					clientSocket = serverSocket.accept(); // get client
+
+					// input stream -> get data from client
+					clientData = clientSocket.getInputStream();
+					clientBuffReader = new BufferedReader(new InputStreamReader(clientData));
+
+					// output stream -> send data to client
+					serverData = clientSocket.getOutputStream();
+					serverOutputStream = new ObjectOutputStream(serverData);
+				} catch (IOException e1) {
+					e1.printStackTrace();
 				}
+
+				boolean isListening = true;
+
+				while (isListening) // processing client
+				{
+					try {
+						// parsing line by line
+						String currentLine;
+						while ((currentLine = clientBuffReader.readLine()) != null && currentLine.length() > 0) {
+							// serverOutputStream.reset();
+							System.out.println("Received from client: " + currentLine);
+
+							if ("GETFILE".equals(currentLine)) // if GETFILE text command is received over
+							// the socket, then reply
+							// back the serialised list encapsulated in the vt object field
+							{
+								serverOutputStream.writeObject(phonesList);
+							} else if ("GETDB".equals(currentLine)) // if GETDB text command is received over
+							// the socket, then reply
+							// back with the list as String produced by UtilsDAO.selectData() (please also
+							// take into account, you have to initialize JDBC connection and close it with
+							// static methods from UtilsDAO);
+							{
+								try {
+									UtilsDAO.setConnection();
+									serverOutputStream.writeObject(UtilsDAO.selectData());
+									UtilsDAO.closeConnection();
+								} catch (SQLException e) {
+									e.printStackTrace();
+								}
+							} else if ("EXIT".equals(currentLine)) {
+								serverOutputStream.writeObject("TCP FIN");
+								isListening = false;
+								clientSocket.close(); // close client connection
+								break;
+							} else {
+								serverOutputStream.writeObject("IDK what that is");
+							}
+						}
+						//System.out.println("Outside the parse while");
+					} catch (IOException e) {
+						e.printStackTrace();
+						// break;
+					}
+				}
+				System.out.println("Goodbye Client!");
+			}
 		};
 		// running TCP server
 		Thread serverThread = new Thread(server);
+		System.out.println("Starting TCP server...");
 		serverThread.start();
 	}
 

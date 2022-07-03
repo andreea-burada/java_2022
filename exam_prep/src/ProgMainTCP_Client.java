@@ -36,18 +36,19 @@ public class ProgMainTCP_Client {
 					Phone currentPh = (Phone) currentElD;
 					System.out.println(currentPh);
 				}
+				System.out.println("\n");
 				
 				writer2Server.println("GETDB");
 				writer2Server.flush();
 				String db = (String) serverObjInput.readObject();
-				System.out.println(db);
+				System.out.println(db + "\n");
 				
 				String received;
 				writer2Server.println("EXIT");
 				writer2Server.flush();
 				
 				received = (String) serverObjInput.readObject();
-				System.out.println(received + "\n\n");
+				System.out.println(received + "\n");
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
