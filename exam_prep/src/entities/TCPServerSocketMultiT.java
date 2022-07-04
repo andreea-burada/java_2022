@@ -66,6 +66,7 @@ public class TCPServerSocketMultiT {
 	private int port = 50001;
 	private File f;
 	private VectThread vt;
+	protected static int noClients = 0;
 
 	// constructors
 	public TCPServerSocketMultiT(int port) throws Exception {
@@ -84,6 +85,7 @@ public class TCPServerSocketMultiT {
 		// processing clients
 		while (true) {
 			Socket clientSocket = serverSocket.accept();
+			int currentClientNo = ++TCPServerSocketMultiT.noClients;
 			// Lambda for TCP
 			Runnable server = () -> {
 				InputStream clientData = null;
@@ -102,14 +104,14 @@ public class TCPServerSocketMultiT {
 					serverData = clientSocket.getOutputStream();
 					serverOutputStream = new ObjectOutputStream(serverData);
 
-					while (isListening) // processing client
+					while (isListening == true) // processing client
 					{
 
 						// parsing line by line
 						String currentLine;
 						while ((currentLine = clientBuffReader.readLine()) != null && currentLine.length() > 0) {
 							// serverOutputStream.reset();
-							System.out.println("Received from client: " + currentLine);
+							System.out.println("Received from client " + currentClientNo + ": " + currentLine + "\n");
 
 							if ("GETFILE".equals(currentLine)) // if GETFILE text command is received over
 							// the socket, then reply
@@ -150,8 +152,10 @@ public class TCPServerSocketMultiT {
 
 							} else if ("EXIT".equals(currentLine)) {
 								serverOutputStream.writeObject("TCP FIN");
-								isListening = false;
 								clientSocket.close(); // close client connection
+
+								isListening = false;
+								break; // exit the parsing loop
 							} else {
 								serverOutputStream.writeObject("IDK what that is");
 							}
@@ -159,18 +163,15 @@ public class TCPServerSocketMultiT {
 						// System.out.println("Outside the parse while");
 
 					}
-					System.out.println("Goodbye Client!\n");
+					System.out.println("Goodbye Client! Socket is closed: " + clientSocket.isClosed() + "\n");
+
+				} catch (SocketException sockex) {
+					System.out.println("Socket Exception caught.");
 				} catch (IOException ioex) {
 					ioex.printStackTrace();
-				} finally {
-					try {
-						clientSocket.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
 				}
-			};	// lambda end
-			
+			}; // lambda end
+
 			// running TCP server -> create thread for each client
 			Thread serverThread = new Thread(server);
 			System.out.println("Hello Client!\n");

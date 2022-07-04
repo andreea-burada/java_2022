@@ -64,14 +64,14 @@ public class ProgMainTCP_Client {
 				}
 
 				String received;
-				writer2Server.println("EXIT");
-				writer2Server.flush();
-				received = (String) serverObjInput.readObject();
-				System.out.println("Client 1 closed\n" + received + "\n");
-				
 				writer2Server2.println("EXIT");
 				writer2Server2.flush();
 				received = (String) serverObjInput2.readObject();
+				System.out.println("Client 1 closed\n" + received + "\n");
+				
+				writer2Server.println("EXIT");
+				writer2Server.flush();
+				received = (String) serverObjInput.readObject();
 				System.out.println("Client 2 closed\n" + received);
 //				while (true)
 //				{

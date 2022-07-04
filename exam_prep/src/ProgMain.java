@@ -1,51 +1,54 @@
+import java.io.IOException;
+import java.net.SocketException;
 import java.sql.SQLException;
 import java.util.List;
 import entities.*;
 
 public class ProgMain {
 
+	@SuppressWarnings("resource")
 	public static void main(String[] args) {
-//		List<ElectronicDevices> testList = null;
-//		String textName = "phoneList.txt";
-//		try {
-//			testList = Utils.readPhones(textName);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		
-//		System.out.println();
-//		for (ElectronicDevices o : testList)
-//		{
-//			Phone p = (Phone)o;
-//			System.out.println(p);
-//		}
-//		
-//		System.out.println("\nReading done. Writing to Binary file...\n");
-//		Utils.writeBinaryPhone("Phones.bin", testList);
-//		
-//		testList.clear();
-//		System.out.println("\nNo. of elements now: " + testList.size());
-//		
-//		testList = Utils.readBinaryPhones("Phones.bin");
-//		
-////		for (ElectronicDevices o : testList)
-////		{
-////			Phone p = (Phone)o;
-////			System.out.println(p);
-////		}		
-//		testList.forEach(System.out::println);
-//		System.out.println();
-//		
-//		UtilsDAO.setConnection();
-//		String query;
-//		try {
-//			query = UtilsDAO.selectData();
-//			System.out.println(query);
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		UtilsDAO.closeConnection();
+		List<ElectronicDevices> testList = null;
+		String textName = "phoneList.txt";
+		try {
+			testList = Utils.readPhones(textName);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
+		System.out.println();
+		for (ElectronicDevices o : testList)
+		{
+			Phone p = (Phone)o;
+			System.out.println(p);
+		}
+		
+		System.out.println("\nReading done. Writing to Binary file...\n");
+		Utils.writeBinaryPhone("Phones.bin", testList);
+		
+		testList.clear();
+		System.out.println("\nNo. of elements now: " + testList.size());
+		
+		testList = Utils.readBinaryPhones("Phones.bin");
+		
+		for (ElectronicDevices o : testList)
+		{
+			Phone p = (Phone)o;
+			System.out.println(p);
+		}		
+		//testList.forEach(System.out::println);
+		System.out.println();
+		
+		UtilsDAO.setConnection();
+		String query;
+		try {
+			query = UtilsDAO.selectData();
+			System.out.println(query);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		UtilsDAO.closeConnection();	
+
 		VectThread t1 = new VectThread("Phones.bin");
 		Thread trd = new Thread(t1);
 		
@@ -62,15 +65,6 @@ public class ProgMain {
 			}
 			System.out.println(phonesList);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
-		// testing TCP
-		try {
-			TCPServerSocketMultiT tcpServer = new TCPServerSocketMultiT(7787);
-			tcpServer.setFileName("Phones.bin");
-			tcpServer.startTCPServer();
-		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
