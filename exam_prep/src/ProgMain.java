@@ -2,6 +2,8 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import entities.*;
 
 public class ProgMain {
@@ -39,15 +41,35 @@ public class ProgMain {
 		//testList.forEach(System.out::println);
 		System.out.println();
 		
-		UtilsDAO.setConnection();
-		String query;
+//		--- STREAMS ---
+		List<ElectronicDevices> streamedList = null;
+		streamedList = testList.stream().filter(x -> ((Phone)x).getDiagonal() > 5)
+				.sorted((a, b) -> ((Phone)a).getProducer().compareTo(((Phone)b).getProducer()))
+				.collect(Collectors.toList());
+		
+		System.out.println("Streams\n");	
+		for(ElectronicDevices o : streamedList)
+		{
+			Phone p = (Phone)o;
+			System.out.println(p);
+		}
+		System.out.println("\n");
+		
+		
+//		--- DB TEST ---
 		try {
+			UtilsDAO.setConnection();
+			String query;
+			
 			query = UtilsDAO.selectData();
 			System.out.println(query);
+			
+			UtilsDAO.closeConnection();
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		UtilsDAO.closeConnection();	
+		
 
 		VectThread t1 = new VectThread("Phones.bin");
 		Thread trd = new Thread(t1);
@@ -61,7 +83,7 @@ public class ProgMain {
 			for(ElectronicDevices eDev : pList)
 			{
 				Phone currentPhone = (Phone)eDev;
-				phonesList += currentPhone.toString() + ";;;\n";
+				phonesList += currentPhone.toString() + "*\n";
 			}
 			System.out.println(phonesList);
 		} catch (InterruptedException e) {

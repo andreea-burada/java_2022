@@ -68,7 +68,7 @@ public class TCPServerSocketMultiT {
 	private VectThread vt;
 	protected static int noClients = 0;
 
-	// constructors
+	// constructors 
 	public TCPServerSocketMultiT(int port) throws Exception {
 		setPort(port);
 		// create the serverSocket
