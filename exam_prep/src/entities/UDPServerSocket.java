@@ -42,6 +42,7 @@ public class UDPServerSocket implements AutoCloseable {
 		byte[] receivedRequest = null;
 		byte[] response = null;
 		DatagramPacket packetToClient = null;
+		DatagramPacket packetFromClient = null;
 		String responseString;
 		
 		// get address
@@ -53,7 +54,7 @@ public class UDPServerSocket implements AutoCloseable {
 		while (socket.isClosed() == false)
 		{
 			receivedRequest = new byte[16];
-			DatagramPacket packetFromClient = new DatagramPacket(receivedRequest, receivedRequest.length);
+			packetFromClient = new DatagramPacket(receivedRequest, receivedRequest.length);
 			
 			// get request
 			socket.receive(packetFromClient); 	// request is in -> receivedRequest

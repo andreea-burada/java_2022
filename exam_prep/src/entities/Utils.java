@@ -16,7 +16,7 @@ public class Utils {
 	
 	public static List<ElectronicDevices> createPhones(int n) throws Exception
 	{
-		if ( n < 0)
+		if (n < 0)
 			throw new Exception ("Invalid n");
 		
 		if (deviceList == null)
@@ -33,6 +33,7 @@ public class Utils {
 		return deviceList;
 	}
 	
+	// read from .txt file
 	public static List<ElectronicDevices> readPhones(String file) throws Exception
 	{
 		// reading line by line 

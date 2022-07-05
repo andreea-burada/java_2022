@@ -42,7 +42,7 @@ public class Phone implements ElectronicDevices, Serializable, Cloneable {
 	}
 	
 	@Override
-	public Object clone()
+	public Object clone() throws CloneNotSupportedException
 	{
 		Phone toReturn =  new Phone();
 		toReturn.weight = weight;

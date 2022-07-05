@@ -51,7 +51,7 @@ public class ProgMainTCP_Client {
 				String db = (String) serverObjInput2.readObject();
 				System.out.println("Client 2\n" + db);
 
-				writer2Server.println("GETJSON");
+				writer2Server.println("GETJSON\nGETDB");
 				writer2Server.flush();
 				// JSONArray phonesJSONArray = (JSONArray) serverObjInput.readObject();
 				String phonesJSONStrArray = (String) serverObjInput.readObject();
@@ -62,6 +62,8 @@ public class ProgMainTCP_Client {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
+				db = (String) serverObjInput.readObject();
+				System.out.println("Client 1\n" + db);
 
 				String received;
 				writer2Server2.println("EXIT");

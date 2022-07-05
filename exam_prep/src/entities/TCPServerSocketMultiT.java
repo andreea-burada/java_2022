@@ -1,9 +1,6 @@
 package entities;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,7 +81,7 @@ public class TCPServerSocketMultiT {
 
 		// processing clients
 		while (true) {
-			Socket clientSocket = serverSocket.accept();
+			Socket clientSocket = serverSocket.accept();	// get client
 			int currentClientNo = ++TCPServerSocketMultiT.noClients;
 			// Lambda for TCP
 			Runnable server = () -> {
@@ -106,7 +103,6 @@ public class TCPServerSocketMultiT {
 
 					while (isListening == true) // processing client
 					{
-
 						// parsing line by line
 						String currentLine;
 						while ((currentLine = clientBuffReader.readLine()) != null && currentLine.length() > 0) {
